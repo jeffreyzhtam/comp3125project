@@ -1,27 +1,78 @@
-#Question: How many games were made for each console?
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
 df = pd.read_csv("data.csv")
-
+df['Year'] = df['Year'].astype('Int64')
 
 #drop the null values and duplicates 
 df.drop_duplicates(inplace = True)
 df.dropna(subset=['Year'],inplace=True)
 df.dropna(subset=['Publisher'],inplace=True)
 
-#General groupings 
-platform_groups = {platform: data for platform, data in df.groupby('Platform')}
+# ---------------------------------------------------------
+#                     JEFFREY'S GRAPHS
+# ---------------------------------------------------------
+#Graph settings
 
-genre_groups = {genre: data for genre, data in df.groupby('Genre')}
+sns.set_theme(style="whitegrid", palette="deep")
 
-publisher_groups = {publisher: data for publisher, data in df.groupby('Publisher')}
+# --- GRAPH 1: Total Global Video Game Sales Over Time ---
+sales_per_year = df.groupby('Year')['Global_Sales'].sum().reset_index()
+
+sns.lineplot(data=sales_per_year, x = "Year", y = "Global_Sales", marker = 'o', palette="flare")
+plt.title("Total Global Video Game Sales Over Time")
+plt.xlabel("Year")
+plt.ylabel("Global Sales (Millions)")
+plt.tight_layout()
+plt.savefig("sales_over_time.png")
+plt.show()
+
+# --- GRAPH 2: Number of Games Released Per Year ---
+plt.figure(figsize=(12,6))
+games_per_year = df.groupby('Year')['Name'].count().reset_index()
+
+sns.barplot(data=games_per_year, x='Year', y='Name', palette='crest')
+plt.title("Number of Games Released Per Year")
+plt.xlabel("Year")
+plt.ylabel("Number of Games")
+plt.tight_layout()
+plt.xticks(rotation=45)
+plt.savefig("games_per_year.png")
+plt.show()
+
+# --- GRAPH 3: Market Share of Top 10 Platforms ---
+platform_sales = df.groupby('Platform')['Global_Sales'].sum().sort_values(ascending=False).head(10)
+colors = sns.color_palette("Paired", 10)
+
+plt.figure(figsize=(10,10))
+plt.axis('equal')
+plt.pie(platform_sales.values, labels=platform_sales.index, autopct='%1.1f%%', startangle=90, colors=colors)
+plt.title("Market Share of Top 10 Platforms")
+plt.tight_layout()
+plt.savefig("platform_market_share.png")
+plt.show()
+exit()
+# --- GRAPH 4: Genre Sales by Region (NA, EU, JP) ---
+region_genre = df.groupby('Genre')[['NA_Sales', 'EU_Sales', 'JP_Sales']].sum().reset_index()
+
+region_genre_long = region_genre.melt( id_vars='Genre', value_vars=['NA_Sales', 'EU_Sales', 'JP_Sales'], var_name='Region', value_name='Sales')
 
 
-#                                               ADAM
+sns.barplot(data=region_genre_long, x='Genre', y='Sales', hue='Region', palette='bright')
+plt.title("Genre Sales by Region")
+plt.xlabel("Genre")
+plt.ylabel("Sales (Millions)")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.savefig("genre_by_region.png")
+plt.show()
 
-#count the number of games per console
+# ---------------------------------------------------------
+#                        ADAM'S GRAPHS
+# ---------------------------------------------------------
+#Question: How many games were made for each console?
+# --- GRAPH 5: Number of Games per Console ---
 counts = df['Platform'].value_counts()
 
 #plotting the data frame
@@ -35,6 +86,9 @@ plt.title("Number of Games per Console")
 plt.tight_layout()
 plt.savefig('games_per_console.png')
 plt.show()
+
+
+# --- GRAPH 6: Publishers with Most PS2 Games ---
 
 #Question: How many games did each developer make for the Play Station 2?
 
@@ -60,6 +114,8 @@ plt.tight_layout()
 plt.savefig('games_on_ps2.png')
 plt.show()
 
+
+# --- GRAPH 7: Publishers with Most DS Games ---
 #Question: How many games did each developer make for the Nintendo DS?
 
 #Filtering so it is only DS games
@@ -83,12 +139,15 @@ plt.tight_layout()
 plt.savefig('games_on_ds.png')
 plt.show()
 
-#                                        Liban
+# ---------------------------------------------------------
+#                         LIBAN'S GRAPHS
+# ---------------------------------------------------------
 
 # Set the visual style
 sns.set(style="whitegrid")
 
-# --- VISUAL 1: Global Sales by Genre ---
+# --- GRAPH 8: Total Global Sales by Genre ---
+
 plt.figure(figsize=(12, 6))
 genre_sales = df.groupby('Genre')['Global_Sales'].sum().sort_values(ascending=False)
 sns.barplot(x=genre_sales.index, y=genre_sales.values, palette="viridis")
@@ -100,7 +159,7 @@ plt.tight_layout()
 plt.savefig('sales_by_genre.png')
 plt.show()
 
-# --- VISUAL 2: Top 10 Platforms by Global Sales ---
+# --- Graph 9: Top 10 Platforms by Global Sales ---
 plt.figure(figsize=(12, 6))
 platform_sales = df.groupby('Platform')['Global_Sales'].sum().sort_values(ascending=False).head(10)
 sns.barplot(x=platform_sales.index, y=platform_sales.values, palette="magma")
@@ -111,7 +170,7 @@ plt.tight_layout()
 plt.savefig('top_platforms.png')
 plt.show()
 
-# --- VISUAL 3: HeatMap ---
+# --- Graph 10: HeatMap of Genre vs. Platform Sales ---
 top_platforms = df.groupby('Platform')['Global_Sales'].sum().sort_values(ascending=False).head(10).index
 heatmap_data = df[df['Platform'].isin(top_platforms)]
 pivot_table = heatmap_data.pivot_table(index='Genre', columns='Platform', values='Global_Sales', aggfunc='sum')
@@ -133,7 +192,7 @@ plt.tight_layout()
 plt.savefig('genre_platform_heatmap.png')
 plt.show()
 
-# --- VISUAL 3: Graph for Top Genres ---
+# --- Graph 11: Evolution of Top Genres Over Time ---
 evolution_data = df[(df['Year'] >= 1995) & (df['Year'] <= 2016)]
 genre_sales_year = evolution_data.groupby(['Year', 'Genre'])['Global_Sales'].sum().unstack()
 
