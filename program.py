@@ -52,11 +52,11 @@ plt.title("Market Share of Top 10 Platforms")
 plt.tight_layout()
 plt.savefig("platform_market_share.png")
 plt.show()
-exit()
-# --- GRAPH 4: Genre Sales by Region (NA, EU, JP) ---
-region_genre = df.groupby('Genre')[['NA_Sales', 'EU_Sales', 'JP_Sales']].sum().reset_index()
 
-region_genre_long = region_genre.melt( id_vars='Genre', value_vars=['NA_Sales', 'EU_Sales', 'JP_Sales'], var_name='Region', value_name='Sales')
+# --- GRAPH 4: Genre Sales by Region (NA, EU, JP) ---
+region_genre = df.groupby('Genre')[['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales']].sum().reset_index()
+
+region_genre_long = region_genre.melt( id_vars='Genre', value_vars=['NA_Sales', 'EU_Sales', 'JP_Sales', 'Other_Sales'], var_name='Region', value_name='Sales')
 
 
 sns.barplot(data=region_genre_long, x='Genre', y='Sales', hue='Region', palette='bright')
@@ -67,7 +67,7 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("genre_by_region.png")
 plt.show()
-
+exit()
 # ---------------------------------------------------------
 #                        ADAM'S GRAPHS
 # ---------------------------------------------------------
