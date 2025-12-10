@@ -1,11 +1,13 @@
+#Libraries
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
+#Read in data from folder
 df = pd.read_csv("data.csv")
 df['Year'] = df['Year'].astype('Int64')
 
-#drop the null values and duplicates 
+#Drop Null values and Duplicates
 df.drop_duplicates(inplace = True)
 df.dropna(subset=['Year'],inplace=True)
 df.dropna(subset=['Publisher'],inplace=True)
@@ -67,7 +69,7 @@ plt.xticks(rotation=45)
 plt.tight_layout()
 plt.savefig("genre_by_region.png")
 plt.show()
-exit()
+
 # ---------------------------------------------------------
 #                        ADAM'S GRAPHS
 # ---------------------------------------------------------
